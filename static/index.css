@@ -1,0 +1,39 @@
+html {
+	--olin-blue: #009bdf;
+	--olin-silver: #a7a9ac;
+	--olin-fonts: OlinDIN, Arial, Helvetica, sans-serif;
+}
+
+@font-face {
+	font-family: OlinDIN;
+	src: url(fonts/din/dinot.otf);
+	font-weight: normal;
+}
+
+@font-face {
+	font-family: OlinDIN;
+	src: url(fonts/din/dinot-bold.otf);
+	font-weight: bold;
+}
+
+* {
+	font-family: var(--olin-fonts);
+}
+
+.navbar-brand {
+	font-size: 1.5em;
+	font-weight: bold;
+	color: black;
+}
+
+.olin-wordmark {
+	color: var(--olin-blue);
+}
+
+.jumbotron {
+	background: none;
+}
+
+.jumbotron > * {
+	text-align: center;
+}
