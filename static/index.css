@@ -48,3 +48,21 @@ h1.display-4 {
 	max-width: 500px;
 	text-align: unset;
 }
+
+section#main {
+	min-height: 100vh;
+	padding-bottom: 10rem;
+}
+
+.faq-questions {
+	margin-top: 1em;
+}
+
+.faq-question {
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+section#faqs {
+	padding: 5ch 5ch;
+}
