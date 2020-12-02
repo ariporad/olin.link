@@ -1,0 +1,34 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Watch",
+			"runtimeExecutable": "nodemon",
+			"program": "${workspaceFolder}/dist/index.js",
+			"restart": true,
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "openOnSessionStart",
+			"preLaunchTask": "TSC Watch",
+			"skipFiles": ["<node_internals>/**"],
+			"envFile": "${workspaceFolder}/.env"
+		},
+
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Run",
+			"skipFiles": ["<node_internals>/**"],
+			"program": "${workspaceFolder}/dist/index.js",
+			"outFiles": ["${workspaceFolder}/**/*.js"],
+			"preLaunchTask": "Build with TSC",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "openOnSessionStart",
+			"envFile": "${workspaceFolder}/.env"
+		}
+	]
+}
