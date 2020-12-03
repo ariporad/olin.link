@@ -70,7 +70,7 @@
 								class="form-control"
 								id="short-url"
 								name="short-url"
-								placeholder="FrankPetsittingTips"
+								placeholder="FeedFrank"
 								pattern="[a-zA-Z0-9_-\.]{5,20}"
 								minlength="5"
 								maxlength="20"
@@ -78,7 +78,7 @@
 							/>
 						</div>
 						<small class="form-text text-muted">
-							Leave blank for a randomly-generated short URL.
+							Leave blank for a randomly-generated short URL. Case-insensitive.
 						</small>
 					</div>
 					<div class="form-group">
@@ -108,24 +108,190 @@
 			<h1><a name="faq">Frequently Asked Questions</a></h1>
 			<div class="faq-questions">
 				<div class="faq-question-section">
-					<h3 class="faq-question">Q: Blah</h3>
-					<p class="faq-answer">Blah Blah Blah</p>
+					<h3 class="faq-question">Q: What is Olin.link?</h3>
+					<div class="faq-answer">
+						A: Olin.link is a URL shortener, much like bit.ly, is.gd, or tinyurl.com. It
+						takes a long URL:
+
+						<pre>
+https://docs.google.com/document/d/1WLh6RhVyW42e4iyw8OjJp_uu9bLQHZtzrr2XKscvndU/edit</pre
+						>
+
+						and turns it into a short one:
+
+						<pre>https://olin.link/VeryImportantDocument</pre>
+
+						As opposed to the long url, the short one is:
+						<ul>
+							<li>Shorter</li>
+							<li>Easier to remember</li>
+							<li>Easier to say out loud</li>
+							<li>
+								Easier to print out and type back in (for example, if you put it on
+								a poster)
+							</li>
+							<li>Cooler</li>
+						</ul>
+					</div>
 				</div>
 				<div class="faq-question-section">
-					<h3 class="faq-question">Q: Blah</h3>
-					<p class="faq-answer">Blah Blah Blah</p>
+					<h3 class="faq-question">
+						Q: Why should I use Olin.link instead of bit.ly/is.gd/tinyurl.com?
+					</h3>
+					<div class="faq-answer">
+						Because it's better! Those tools all have several limitations that Olin.link
+						does not:
+
+						<ul>
+							<li>
+								<b>It's often hard to get a good shortlink</b>, leaving you with
+								something like <code>bit.ly/OlinShopWorkOrder2</code>. Because
+								Olin.link is only used by the Olin community, these sorts of naming
+								conflicts are much less likely.
+							</li>
+							<li>
+								When you do get a good shortlink (like
+								<code>tinyurl.com/menu</code>),
+								<b
+									>you're polluting the global address pool and preventing anybody
+									else from using that shortlink ever again.</b
+								>
+								With Olin.link, that's much less likely to be an issue because, for
+								example, Olin only has one dining hall that only has one menu.
+							</li>
+							<li>
+								<b
+									>Olin.link shortlinks can be updated to point to a different
+									long URL later on,</b
+								>
+								even if the original owner has left the community—so
+								<code>olin.link/menu</code> can live on forever as the link to the
+								current dining hall menu, even if the full URL changes.
+							</li>
+							<li>
+								<b
+									><code>tinyurl.com/whatever</code> is boring.
+									<code>Olin.link/whatever</code> is cool, unique, and
+									interesting.</b
+								>
+							</li>
+							<li>
+								<b
+									>By using other URL shortening services, you're exposing the
+									community to privacy risks</b
+								>
+								by forcing every request for a resource to go through a 3rd party
+								with unknown data protection protocols. Olin.link is less risky
+								because it's run by your fellow Oliners—who you hopefully trust a
+								bit more than some random strangers on the internet—and because of
+								our very strict privacy policy, which is listed below.
+							</li>
+						</ul>
+					</div>
 				</div>
 				<div class="faq-question-section">
-					<h3 class="faq-question">Q: Blah</h3>
-					<p class="faq-answer">Blah Blah Blah</p>
+					<h3 class="faq-question">
+						Q: What can I use Olin.link for? Are there any limitations? Does it cost
+						money?
+					</h3>
+					<div class="faq-answer">
+						A: You're welcome to use olin.link for anything you'd like, and it's free!
+						As always, please remember the Honor Code and to Be A Good Person.&trade;
+						<br />
+						<b>Caveat:</b> Olin.link is provided on a best-effort basis. While it's fine
+						to share a shortlink publicly, if it goes viral and Olin.link starts getting
+						hit hundreds of times per second, it might stop working.
+					</div>
 				</div>
 				<div class="faq-question-section">
-					<h3 class="faq-question">Q: Blah</h3>
-					<p class="faq-answer">Blah Blah Blah</p>
+					<h3 class="faq-question">Q: Who's behind Olin.link?</h3>
+					<div class="faq-answer">
+						Olin.link was built and is maintained by
+						<a
+							href="mailto:aporad@olin.edu?subject=Olin.link%20Question"
+							alt="Email Ari"
+							>Ari Porad</a
+						>, a member of the Olin Class of 2024, because he got sick of stupid
+						TinyURLs.
+					</div>
 				</div>
 				<div class="faq-question-section">
-					<h3 class="faq-question">Q: Blah</h3>
-					<p class="faq-answer">Blah Blah Blah</p>
+					<h3 class="faq-question">
+						Q: Is Olin.link open-source? Can I contribute to it?
+					</h3>
+					<div class="faq-answer">
+						Yes! Olin.link's code can be found
+						<a href="https://github.com/ariporad/olin.link" alt="Olin.link Github Repo"
+							>on GitHub</a
+						>, and contributions are welcome! Feel free to reach out to Ari for help if
+						you're looking for a place to start.
+					</div>
+				</div>
+				<div class="faq-question-section">
+					<h3 class="faq-question">Q: What's Olin.link's Privacy Policy?</h3>
+					<div class="faq-answer">
+						Privacy is a fundemental human right, and Olin.link tries hard to respect
+						your privacy.
+
+						<h4>When you create a shortlink, we collect and store:</h4>
+						<ul>
+							<li>The long URL that your shortlink points to</li>
+							<li>
+								The short URL that you've requested, or a randomly-generated default
+							</li>
+							<li>Your IP address, for fraud prevention</li>
+							<li>
+								Your Olin email address, for fraud prevention, so we can reach out
+								if there's an issue with your shortlink, and so we can know who's
+								allowed to edit a shortlink.
+							</li>
+							<li>The time</li>
+						</ul>
+
+						<h4>When somebody clicks on a shortlink, we collect and store:</h4>
+						<ul>
+							<li>The shortlink they requested</li>
+							<li>
+								Their IP address, in anonymized form. Specifically, if they're
+								on-campus or connecting from the Olin network, we store that.
+								Otherwise, we store their IP address with the last octet zeroed out
+								(for example,
+								<code>12.34.56.78</code> is stored in anonymized form as
+								<code>12.34.56.0</code>).
+							</li>
+							<li>The time</li>
+						</ul>
+
+						<h4>Here's how we use that information:</h4>
+						<ul>
+							<li>
+								We use this information for the obvious purpose of matching
+								shortlinks to long URLs
+							</li>
+							<li>
+								We use that information to allow you to change the long URL that
+								your shortlink points to
+							</li>
+							<li>
+								We may use that information to combat fraud, improve the service,
+								and generally understand how people are using Olin.link
+							</li>
+							<li>
+								We may use your email to contact you if we have concerns about one
+								of your shortlinks or if there's another issue
+							</li>
+							<li>
+								We may provide any of this information to the Olin administration,
+								StAR, the Honor Board, or another entity if we have a legitimite
+								reason to believe that it's in the interests of the community
+							</li>
+							<li>
+								If we receive a valid legal order from a law enforcement authority
+								with relevant jurisdiction, we'll be forced to turn over any of the
+								data we've collected
+							</li>
+						</ul>
+					</div>
 				</div>
 			</div>
 		</section>

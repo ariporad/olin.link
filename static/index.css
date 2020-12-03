@@ -61,8 +61,28 @@ section#main {
 .faq-question {
 	font-size: 1.2em;
 	font-weight: bold;
+	margin-top: 0.8em;
 }
 
 section#faqs {
 	padding: 5ch 5ch;
+}
+
+.faq-answer pre {
+	display: block;
+	margin: 1em 0;
+}
+
+.faq-answer h4 {
+	font-size: 1em;
+	font-weight: bold;
+	margin-top: 1em;
+}
+
+.faq-answer code {
+	color: #333;
+}
+
+.faq-answer ul {
+	margin-bottom: 0;
 }
