@@ -45,13 +45,13 @@
 			<div class="jumbotron">
 				<h1 class="display-4"><span class="olin-wordmark">Olin</span>.link</h1>
 				<p class="lead">A URL Shortener for the Olin Community</p>
-				<form>
+				<form action="/api/form-create" method="POST">
 					<div class="form-group">
 						<label for="long-url">Long URL</label>
 						<input
 							type="url"
 							class="form-control"
-							name="long-url"
+							name="url"
 							id="long-url"
 							placeholder="https://www.google.com/search?q=how+to+feed+a+pheonix"
 							required
@@ -69,12 +69,11 @@
 								aria-describedby="olin-link-input-group-prefix"
 								class="form-control"
 								id="short-url"
-								name="short-url"
+								name="id"
 								placeholder="FeedFrank"
-								pattern="[a-zA-Z0-9_-\.]{5,20}"
+								pattern="^[a-zA-Z0-9_\-\.]{5,20}$"
 								minlength="5"
 								maxlength="20"
-								required
 							/>
 						</div>
 						<small class="form-text text-muted">
@@ -88,7 +87,7 @@
 							class="form-control"
 							name="email"
 							id="email"
-							pattern=".*@{students\.,alumni\.,faculty\.,staff\.,}olin\.edu$"
+							pattern="^[a-zA-Z0-9\.]+@(students\.|alumni\.|faculty\.|staff\.|)olin\.edu$"
 							placeholder="fpheonix@olin.edu"
 							title="Please enter your @olin.edu email address."
 							required
