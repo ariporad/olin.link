@@ -42,11 +42,32 @@ h1.display-4 {
 	text-align: center;
 }
 
-.jumbotron > .form-container {
+.form-container {
 	margin-left: auto;
 	margin-right: auto;
 	max-width: 500px;
 	text-align: unset;
+}
+
+.success-url-container {
+	max-width: 100%;
+	font-size: max(1rem, min(3.5rem, 8vw));
+}
+
+.success-url-container > .success-shortlink {
+	word-break: break-all;
+	max-width: 100%;
+}
+
+.success-url-container > .success-url {
+	max-width: 100%;
+	white-space: nowrap;
+	overflow-x: auto;
+
+	/* Don't know why we need these two, but it prevents vertical scroll bars. I can't figure out
+	   any other way to get that to happen. */
+	overflow-y: hidden;
+	padding-bottom: 0.25em;
 }
 
 section#main {

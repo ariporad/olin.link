@@ -6,6 +6,7 @@ import nunjucks from 'nunjucks';
 import Model from './model';
 import { isValidURL } from './helpers';
 import { stringify } from 'querystring';
+import { toString as generateQRCode } from 'qrcode';
 
 const app = express();
 const model = new Model();
@@ -78,7 +79,39 @@ app.post('/api/form-create', async (req, res) => {
 
 	const shortlink = await model.createShortlink(email, url, id);
 
-	res.redirect(`/success?${stringify({ id: shortlink.id, url: shortlink.longURL })}`);
+	res.redirect(`/${id}/success`);
+});
+
+app.get('/:shortlink/success', async (req, res) => {
+	const id = req.params.shortlink;
+
+	if (!id || typeof id !== 'string') {
+		res.redirect(
+			'/?' + stringify({ flash: 'Internal Error! Unknown Shortlink!', flashtype: 'danger' }),
+		);
+		return;
+	}
+
+	const shortlink = await model.getById(id);
+
+	if (shortlink === undefined) {
+		res.redirect(
+			'/?' + stringify({ flash: 'Internal Error! Unknown Shortlink!', flashtype: 'danger' }),
+		);
+		return;
+	}
+
+	res.render('./views/success.html', {
+		id: shortlink.id,
+		url: shortlink.longURL,
+	});
+});
+
+app.get('/:shortlink/qrcode', async (req, res) => {
+	const svg = await generateQRCode(`https://olin.link/${req.params.shortlink}`, { type: 'svg' });
+	res.header('Content-Type', 'image/svg+xml');
+	res.write(svg);
+	res.end();
 });
 
 app.get('/:shortlink', async (req, res, next) => {
