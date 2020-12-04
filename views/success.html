@@ -30,11 +30,59 @@
 		<div class="alert alert-{{ flashType }}" role="alert">{{ flash }}</div>
 		{% endif %}
 
-		<img
-			src="qrcode"
-			alt="QR Code"
-			style="width: 100%; margin-left: auto; margin-right: auto"
-		/>
+		<img src="qrcode.svg" alt="QR Code" />
+		<a
+			href="qrcode.svg"
+			alt="Download QR Code as SVG"
+			class="btn btn-primary"
+			download="OlinLink-{{ id }}.svg"
+			>Download SVG</a
+		>
+		<a
+			href="qrcode.png"
+			alt="Download QR Code as PNG"
+			class="btn btn-primary"
+			download="OlinLink-{{ id }}.png"
+			>Download PNG</a
+		>
+
+		<button class="btn btn-primary" id="copy-qr" hidden disabled>Copy</button>
 	</div>
 </div>
+
+<script>
+	if (
+		navigator.clipboard &&
+		typeof navigator.clipboard.write === 'function' &&
+		typeof Blob === 'function'
+	) {
+		const urlBlob = new Blob(['https://olin.link/{{ id }}'], {
+			type: 'text/plain',
+		});
+
+		// Try to make the copy image button work
+		if (typeof fetch === 'function') {
+			const copyBtn = document.getElementById('copy-qr');
+
+			copyBtn.onclick = async function () {
+				const res = await fetch('qrcode.png');
+				const image = await res.blob();
+				await navigator.clipboard.write([
+					new ClipboardItem({
+						[image.type]: image,
+						[urlBlob.type]: urlBlob,
+					}),
+				]);
+			};
+
+			copyBtn.hidden = false;
+			copyBtn.disabled = false;
+		}
+
+		// Copy the URL anyways
+		(async function () {
+			await navigator.clipboard.write([new ClipboardItem({ [urlBlob.type]: urlBlob })]);
+		})();
+	}
+</script>
 {% endblock %}

@@ -6,7 +6,7 @@ import nunjucks from 'nunjucks';
 import Model from './model';
 import { isValidURL } from './helpers';
 import { stringify } from 'querystring';
-import { toString as generateQRCode } from 'qrcode';
+import { toString as generateQRCodeString, toFileStream as generateQRCodeStream } from 'qrcode';
 
 const app = express();
 const model = new Model();
@@ -107,11 +107,18 @@ app.get('/:shortlink/success', async (req, res) => {
 	});
 });
 
-app.get('/:shortlink/qrcode', async (req, res) => {
-	const svg = await generateQRCode(`https://olin.link/${req.params.shortlink}`, { type: 'svg' });
+app.get('/:shortlink/qrcode.svg', async (req, res) => {
+	const svg = await generateQRCodeString(`https://olin.link/${req.params.shortlink}`, {
+		type: 'svg',
+	});
 	res.header('Content-Type', 'image/svg+xml');
 	res.write(svg);
 	res.end();
+});
+
+app.get('/:shortlink/qrcode.png', async (req, res) => {
+	res.header('Content-Type', 'image/png');
+	generateQRCodeStream(res, `https://olin.link/${req.params.shortlink}`);
 });
 
 app.get('/:shortlink', async (req, res, next) => {
