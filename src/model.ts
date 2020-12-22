@@ -1,46 +1,114 @@
+import { Client, QueryResult, QueryResultRow } from 'pg';
+import { randomString } from './helpers';
+
+type ArrayQueryResult<R extends QueryResultRow = any> = QueryResult<R> & Array<R>;
+
 export interface Shortlink {
-	longURL: string;
+	url: string;
 	id: string;
 	user: string;
-	hitCount: number;
+	hit_count: number;
+}
+
+export class ModelError extends Error {
+	readonly code: string;
+
+	constructor(message: string, code: string) {
+		super(message);
+		this.code = code;
+	}
 }
 
 export default class Model {
-	shortlinks: Shortlink[] = [];
+	private client = new Client();
 
-	async createShortlink(user: string, longURL: string, id: string): Promise<Shortlink> {
-		const shortlink = {
-			id: id.toLowerCase(),
-			longURL,
-			user,
-			hitCount: 0,
-		};
+	private isConnected = false;
 
-		this.shortlinks.push(shortlink);
-
-		return shortlink;
+	public get connected(): boolean {
+		return this.isConnected;
 	}
 
-	async getByIdAndRecordHit(id: string): Promise<Shortlink | undefined> {
-		const shortlink = await this.getById(id);
+	public async connect() {
+		if (this.connected) throw new Error('Already connected!');
+		await this.client.connect();
+		this.isConnected = true;
+	}
 
-		if (shortlink) {
-			shortlink.hitCount++;
+	private async query<R extends QueryResultRow>(
+		strings: TemplateStringsArray,
+		...embeds: string[]
+	): Promise<ArrayQueryResult<R>> {
+		if (!this.isConnected) throw new Error("Can't query if not connected!");
+
+		let queryString = '';
+
+		for (let i = 0; i < embeds.length; i++) {
+			queryString += strings[i] + `$${i + 1}`;
 		}
 
+		queryString += strings[strings.length - 1];
+
+		const queryResult = await this.client.query(queryString, embeds);
+
+		return Object.assign(queryResult.rows, queryResult);
+	}
+
+	async createShortlink(user: string, url: string, id?: string): Promise<Shortlink> {
+		// FIXME: This leads to a race condition where it's possible (but very unlikely) that the
+		//        random ID is used between when it's generated/checked and when it's inserted.
+		//        We should do the loop if the insert fails instead.
+
+		let randomID = false;
+
+		if (!id) {
+			id = await randomString(6);
+			randomID = true;
+		}
+
+		try {
+			const [shortlink] = await this.query<Shortlink>`
+				INSERT INTO shortlinks (id, url, email)
+				VALUES (${id}, ${url}, ${user})
+				RETURNING *;
+			`;
+
+			return shortlink;
+		} catch (err) {
+			// If this ID is already taken
+			if (err.code === '23505' && err.constraint === 'shortlinks_pkey') {
+				if (randomID) {
+					// If the ID was random to begin with, just try again (which will generate a new
+					// id in the process)
+					// FIXME: If we ever ran out of randomly generated IDs, this would recurse forever
+					return await this.createShortlink(user, url);
+				} else {
+					throw new ModelError(`Shortlink ID "${id}" is already in use!`, 'EIDINUSE');
+				}
+			}
+
+			throw new ModelError(`Unknown Database Error: ${err.message}`, 'EDBERROR');
+		}
+	}
+
+	public async getById(id: string): Promise<Shortlink | undefined> {
+		const [shortlink] = await this.query<Shortlink>`
+			SELECT *
+			FROM shortlinks
+			WHERE id = ${id}
+			LIMIT 1;
+		`;
+
 		return shortlink;
 	}
 
-	async getById(id: string): Promise<Shortlink | undefined> {
-		id = id.toLowerCase();
-		return this.shortlinks.find((s) => s.id === id);
-	}
+	public async getByIdAndRecordHit(id: string): Promise<Shortlink | undefined> {
+		const [shortlink] = await this.query<Shortlink>`
+			UPDATE shortlinks
+			SET hit_count = hit_count + 1
+			WHERE id = ${id}
+			RETURNING *;
+		`;
 
-	async hasID(id: string): Promise<boolean> {
-		return !!(await this.getById(id));
-	}
-
-	async generateRandomID(): Promise<string> {
-		return (this.shortlinks.length + 1).toString(36).padStart(6, '0');
+		return shortlink;
 	}
 }
