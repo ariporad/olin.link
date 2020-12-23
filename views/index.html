@@ -1,74 +1,62 @@
-{% extends "./_template.html" %}
-
-<!-- Shortening Form -->
-{% block main_section %}
-<div class="jumbotron">
-	<h1 class="display-4"><span class="olin-wordmark">Olin</span>.link</h1>
-	<p class="lead">A URL Shortener for the Olin Community</p>
-
-	<div class="form-container">
-		{% if flash %}
-		<div class="alert alert-{{ flashType }}" role="alert">{{ flash }}</div>
-		{% endif %}
-
-		<form action="/api/form-create" method="POST">
-			<div class="form-group">
-				<label for="long-url">Long URL</label>
-				<input
-					type="url"
-					class="form-control"
-					name="url"
-					id="long-url"
-					placeholder="https://www.google.com/search?q=how+to+feed+a+pheonix"
-					value="{{ url }}"
-					required
-				/>
-			</div>
-			<div class="form-group">
-				<label for="short-url">Short URL</label>
-				<div class="input-group">
-					<div class="input-group-prepend">
-						<span class="input-group-text" id="olin-link-input-group-prefix">
-							<b><span class="olin-wordmark">Olin</span>.link</b>/
-						</span>
-					</div>
-					<input
-						aria-describedby="olin-link-input-group-prefix"
-						class="form-control"
-						id="short-url"
-						name="id"
-						placeholder="FeedFrank"
-						pattern="^[a-zA-Z0-9_\-\.]{5,20}$"
-						minlength="5"
-						maxlength="20"
-						value="{{ id }}"
-					/>
-				</div>
-				<small class="form-text text-muted">
-					Leave blank for a randomly-generated short URL. Case-insensitive.
-				</small>
-			</div>
-			<div class="form-group">
-				<label for="email">Email</label>
-				<input
-					type="email"
-					class="form-control"
-					name="email"
-					id="email"
-					pattern="^[a-zA-Z0-9\.]+@(students\.|alumni\.|faculty\.|staff\.|)olin\.edu$"
-					placeholder="fpheonix@olin.edu"
-					title="Please enter your @olin.edu email address."
-					value="{{ email }}"
-					required
-				/>
-				<small class="form-text text-muted"> Your email will not be made public. </small>
-			</div>
-			<div class="form-group float-right">
-				<button class="btn btn-primary" type="submit">Go!</button>
-			</div>
-		</form>
+{% extends "./_extended_template.html" %} {% block title_content %}
+<span class="olin-wordmark">Olin</span>.link {% endblock %} {% block subtitle_content %} A URL
+Shortener for the Olin Community {% endblock %} {% block main_content %}
+<form action="/api/form-create" method="POST">
+	<div class="form-group">
+		<label for="long-url">Long URL</label>
+		<input
+			type="url"
+			class="form-control"
+			name="url"
+			id="long-url"
+			placeholder="https://www.google.com/search?q=how+to+feed+a+pheonix"
+			value="{{ url }}"
+			required
+		/>
 	</div>
-</div>
+	<div class="form-group">
+		<label for="short-url">Short URL</label>
+		<div class="input-group">
+			<div class="input-group-prepend">
+				<span class="input-group-text" id="olin-link-input-group-prefix">
+					<b><span class="olin-wordmark">Olin</span>.link</b>/
+				</span>
+			</div>
+			<input
+				aria-describedby="olin-link-input-group-prefix"
+				class="form-control"
+				id="short-url"
+				name="id"
+				placeholder="FeedFrank"
+				pattern="^[a-zA-Z0-9_\-\.]{5,20}$"
+				minlength="5"
+				maxlength="20"
+				value="{{ id }}"
+			/>
+		</div>
+		<small class="form-text text-muted">
+			Leave blank for a randomly-generated short URL. Case-insensitive.
+		</small>
+	</div>
+	<div class="form-group">
+		<label for="email">Email</label>
+		<input
+			type="email"
+			class="form-control"
+			name="email"
+			id="email"
+			pattern="^[a-zA-Z0-9\.]+@(students\.|alumni\.|faculty\.|staff\.|)olin\.edu$"
+			placeholder="fpheonix@olin.edu"
+			title="Please enter your @olin.edu email address."
+			value="{{ email }}"
+			required
+		/>
+		<small class="form-text text-muted"> Your email will not be made public. </small>
+	</div>
+	<div class="form-group float-right">
+		<button class="btn btn-primary" type="submit">Go!</button>
+	</div>
+</form>
 {% endblock %}
 
 <!-- FAQ Section -->

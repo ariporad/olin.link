@@ -1,0 +1,15 @@
+{% extends "./_basic_template.html" %}
+
+<!-- Shortening Form -->
+{% block main_section %}
+<div class="jumbotron">
+	<h1 class="display-4">{% block title_content %}{% endblock %}</h1>
+	<p class="lead">{% block subtitle_content %}{% endblock %}</p>
+
+	<div class="form-container">
+		{% if flash %}
+		<div class="alert alert-{{ flashType }}" role="alert">{{ flash }}</div>
+		{% endif %} {% block main_content %} {% endblock %}
+	</div>
+</div>
+{% endblock %}
