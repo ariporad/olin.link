@@ -1,10 +1,10 @@
-{% extends "./_extended_template.html" %}
+{% set name = "success" %} {% extends "./_extended_template.html" %}
 
 <!-- Shortening Form -->
 {% block title_content %}
 <div class="success-url-container">
-	<div class="success-shortlink">
-		<span class="olin-wordmark">olin</span>.link/<span style="display: inline-block"
+	<div class="success-shortlink url-wrap">
+		<span class="olin-wordmark">Olin</span>.link/<span style="display: inline-block"
 			>{{ id }}</span
 		>
 	</div>
@@ -21,7 +21,7 @@
 			d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"
 		/>
 	</svg>
-	<div class="success-url">{{ url }}</div>
+	<div class="success-url url-wrap">{{ url }}</div>
 </div>
 {% endblock %} {% block main_content %}
 <!---

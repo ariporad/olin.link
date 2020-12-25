@@ -1,4 +1,4 @@
-{% extends "./_extended_template.html" %} {% block title_content %}
+{% set name = "index" %} {% extends "./_extended_template.html" %} {% block title_content %}
 <span class="olin-wordmark">Olin</span>.link {% endblock %} {% block subtitle_content %} A URL
 Shortener for the Olin Community {% endblock %} {% block main_content %}
 <form action="/api/form-create" method="POST">

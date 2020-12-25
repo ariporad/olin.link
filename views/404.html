@@ -1,0 +1,13 @@
+{% set name = "notfound" %} {% extends "./_extended_template.html" %}
+
+<!-- Main Section -->
+{% block title_content %} Sorry!
+<span class="notfound-shortlink url-wrap">
+	<span class="olin-wordmark">Olin</span>.link/<span style="display: inline-block">{{ id }}</span>
+</span>
+Doesn't Exist {% endblock %} {% block main_content %}
+<div class="notfound-button-container">
+	Yet...
+	<a href="/?id={{id}}" alt="Create olin.link/{{id}}" class="btn btn-primary">Do Something</a>
+</div>
+{% endblock %}

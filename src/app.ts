@@ -141,8 +141,16 @@ export default async function createApp() {
 	});
 
 	app.get('/:shortlink', async (req, res, next) => {
-		const shortlink = await model.getByIdAndRecordHit(req.params.shortlink);
-		if (!shortlink) return next();
+		const id = req.params.shortlink;
+
+		const shortlink = await model.getByIdAndRecordHit(id);
+
+		if (!shortlink) {
+			res.status(404);
+			res.render('./views/404.html', { id });
+			return;
+		}
+
 		res.redirect(shortlink.url);
 	});
 
