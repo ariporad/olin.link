@@ -19,7 +19,7 @@ export default function createFrontendRouter(model: Model): Router {
 		res.render('./views/index.html', locals);
 	});
 
-	router.post('/api/form-create', async (req, res) => {
+	router.post('/_/form-create', async (req, res) => {
 		let { url, email, id } = req.body;
 
 		if (typeof url !== 'string' || !isValidURL(url, ['http:', 'https:', 'mailto:'])) {
