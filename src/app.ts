@@ -5,6 +5,7 @@ import nunjucks from 'nunjucks';
 import Model from './model';
 import createFrontendRouter from './routers/frontend';
 import createShortlinkRouter from './routers/shortlink';
+import createAdminRouter from './routers/admin';
 
 export default async function createApp() {
 	const app = express();
@@ -26,6 +27,7 @@ export default async function createApp() {
 
 	app.use(createFrontendRouter(model));
 	app.use(createShortlinkRouter(model));
+	app.use(createAdminRouter(model));
 
 	return app;
 }

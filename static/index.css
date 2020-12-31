@@ -125,3 +125,11 @@ section#faqs {
 .faq-answer ul {
 	margin-bottom: 0;
 }
+
+body.admin tr:not(.editing) .editable {
+	display: none;
+}
+
+body.admin tr.editing .no-edit {
+	display: none;
+}

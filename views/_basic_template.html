@@ -31,10 +31,10 @@
 				<a class="navbar-brand" href="/"><span class="olin-wordmark">Olin</span>.link</a>
 
 				<div class="navbar-nav ml-auto">
+					{% block navbar_right %}
 					<a class="nav-item nav-link" href="/#faq">FAQ</a>
-					{% if name != "index" %}
 					<a class="nav-item btn btn-outline-success" href="/">New</a>
-					{% endif %}
+					{% endblock %}
 				</div>
 			</nav>
 

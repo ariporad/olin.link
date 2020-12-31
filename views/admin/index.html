@@ -1,0 +1,95 @@
+{% set name = "admin" %} {% extends "../_basic_template.html" %}
+
+<!-- Remove the "New" button from the navbar -->
+{% block navbar_right %}
+<a class="nav-item nav-link" href="/_/admin">Admin</a>
+{% endblock %}
+
+<!-- Main Section -->
+{% block main_section %}
+<table class="table table-hover table-striped">
+	<thead>
+		<tr>
+			<th>Shortlink</th>
+			<th>Owner</th>
+			<th>Long URL</th>
+			<th>Hits</th>
+			<th>Date</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for shortlink in shortlinks %}
+		<tr data-shortlinkid="{{shortlink.id}}">
+			<form action="/_/admin/update" method="POST">
+				<input type="hidden" name="id" value="{{shortlink.id}}" />
+				<td>
+					<span class="no-edit">
+						<span class="olin-wordmark">Olin</span>.link/<b>{{shortlink.id}}</b>
+					</span>
+					<span class="editable">
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text" id="olin-link-input-group-prefix">
+									<b><span class="olin-wordmark">Olin</span>.link</b>/
+								</span>
+							</div>
+							<input
+								aria-describedby="olin-link-input-group-prefix"
+								class="form-control"
+								id="short-url"
+								name="newid"
+								pattern="^[a-zA-Z0-9_\-\.]{5,20}$"
+								minlength="5"
+								maxlength="20"
+								value="{{shortlink.id}}"
+								required
+							/>
+						</div>
+					</span>
+				</td>
+				<td>
+					<span class="no-edit">{{shortlink.email}}</span>
+					<input
+						type="email"
+						class="form-control editable"
+						name="email"
+						id="email"
+						pattern="^[a-zA-Z0-9\.]+@(students\.|alumni\.|faculty\.|staff\.|)olin\.edu$"
+						title="Please enter your @olin.edu email address."
+						value="{{shortlink.email}}"
+						required
+					/>
+				</td>
+				<td>
+					<span class="no-edit">{{shortlink.url}}</span>
+					<input
+						type="url"
+						class="form-control editable"
+						name="url"
+						id="long-url"
+						value="{{shortlink.url}}"
+						required
+					/>
+				</td>
+				<td>{{shortlink.hit_count}}</td>
+				<td>{{shortlink.created_at.toLocaleString()}}</td>
+				<td>
+					<button
+						class="btn btn-primary no-edit"
+						onclick="event.preventDefault(); this.parentElement.parentElement.classList.add('editing');"
+					>
+						Edit
+					</button>
+					<input class="btn btn-success editable" type="submit" value="Save" />
+				</td>
+			</form>
+		</tr>
+		{% else %}
+		<tr>
+			<td colspan="4" display="text-align: center;"><i>No shortlinks to display.</i></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

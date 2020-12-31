@@ -6,8 +6,9 @@ type ArrayQueryResult<R extends QueryResultRow = any> = QueryResult<R> & Array<R
 export interface Shortlink {
 	url: string;
 	id: string;
-	user: string;
+	email: string;
 	hit_count: number;
+	created_at: Date;
 }
 
 export class ModelError extends Error {
@@ -36,7 +37,7 @@ export default class Model {
 
 	private async query<R extends QueryResultRow>(
 		strings: TemplateStringsArray,
-		...embeds: string[]
+		...embeds: (string | number)[]
 	): Promise<ArrayQueryResult<R>> {
 		if (!this.isConnected) throw new Error("Can't query if not connected!");
 
@@ -110,5 +111,15 @@ export default class Model {
 		`;
 
 		return shortlink;
+	}
+
+	public async listShortlinks(start: number, count: number): Promise<Shortlink[]> {
+		return await this.query<Shortlink>`
+			SELECT *
+			FROM shortlinks
+			ORDER BY created_at ASC
+			OFFSET ${start} ROWS
+			FETCH NEXT ${count} ROWS ONLY;
+		`;
 	}
 }
