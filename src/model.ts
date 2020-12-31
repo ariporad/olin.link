@@ -122,4 +122,20 @@ export default class Model {
 			FETCH NEXT ${count} ROWS ONLY;
 		`;
 	}
+
+	public async updateShortlink(
+		oldID: string,
+		newID: string,
+		url: string,
+		email: string,
+	): Promise<Shortlink | null> {
+		const shortlinks = await this.query<Shortlink>`
+			UPDATE shortlinks
+			SET id = ${newID}, url = ${url}, email = ${email}
+			WHERE id = ${oldID}
+			RETURNING *;
+		`;
+
+		return shortlinks[0] || null;
+	}
 }

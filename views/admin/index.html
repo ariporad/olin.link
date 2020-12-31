@@ -11,8 +11,8 @@
 	<thead>
 		<tr>
 			<th>Shortlink</th>
-			<th>Owner</th>
 			<th>Long URL</th>
+			<th>Owner</th>
 			<th>Hits</th>
 			<th>Date</th>
 			<th>Actions</th>
@@ -21,8 +21,9 @@
 	<tbody>
 		{% for shortlink in shortlinks %}
 		<tr data-shortlinkid="{{shortlink.id}}">
+			<a name="shortlink-{{shortlink.id}}" />
 			<form action="/_/admin/update" method="POST">
-				<input type="hidden" name="id" value="{{shortlink.id}}" />
+				<input type="hidden" name="oldid" value="{{shortlink.id}}" />
 				<td>
 					<span class="no-edit">
 						<span class="olin-wordmark">Olin</span>.link/<b>{{shortlink.id}}</b>
@@ -49,6 +50,17 @@
 					</span>
 				</td>
 				<td>
+					<span class="no-edit">{{shortlink.url}}</span>
+					<input
+						type="url"
+						class="form-control editable"
+						name="url"
+						id="long-url"
+						value="{{shortlink.url}}"
+						required
+					/>
+				</td>
+				<td>
 					<span class="no-edit">{{shortlink.email}}</span>
 					<input
 						type="email"
@@ -61,17 +73,6 @@
 						required
 					/>
 				</td>
-				<td>
-					<span class="no-edit">{{shortlink.url}}</span>
-					<input
-						type="url"
-						class="form-control editable"
-						name="url"
-						id="long-url"
-						value="{{shortlink.url}}"
-						required
-					/>
-				</td>
 				<td>{{shortlink.hit_count}}</td>
 				<td>{{shortlink.created_at.toLocaleString()}}</td>
 				<td>
@@ -80,6 +81,12 @@
 						onclick="event.preventDefault(); this.parentElement.parentElement.classList.add('editing');"
 					>
 						Edit
+					</button>
+					<button
+						class="btn btn-outline-danger editable"
+						onclick="event.preventDefault(); this.parentElement.parentElement.classList.remove('editing');"
+					>
+						Cancel
 					</button>
 					<input class="btn btn-success editable" type="submit" value="Save" />
 				</td>
