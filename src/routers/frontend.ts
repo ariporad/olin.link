@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import { stringify } from 'querystring';
 import { isValidURL } from '../helpers';
+import getDefaultMailer from '../mail';
 import Model from '../model';
 
-export default function createFrontendRouter(model: Model): Router {
+export default async function createFrontendRouter(model: Model): Promise<Router> {
 	const router = Router();
+	const mailer = await getDefaultMailer();
 
 	router.get('/', (req, res) => {
 		const locals: any = {
@@ -63,6 +65,11 @@ export default function createFrontendRouter(model: Model): Router {
 
 		try {
 			const shortlink = await model.createShortlink(email, url, id);
+			await mailer.sendMail(
+				email,
+				`You've created Olin.link/${shortlink.id}!`,
+				'Test Message',
+			);
 			res.redirect(`/${shortlink.id}/success`);
 		} catch (err) {
 			if (err.code === 'EIDINUSE') {

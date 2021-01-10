@@ -25,9 +25,9 @@ export default async function createApp() {
 	app.use(bodyParser.json());
 	app.use(bodyParser.urlencoded());
 
-	app.use(createFrontendRouter(model));
-	app.use(createShortlinkRouter(model));
-	app.use(createAdminRouter(model));
+	app.use(await createFrontendRouter(model));
+	app.use(await createShortlinkRouter(model));
+	app.use(await createAdminRouter(model));
 
 	return app;
 }
