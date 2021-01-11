@@ -138,4 +138,14 @@ export default class Model {
 
 		return shortlinks[0] || null;
 	}
+
+	public async deleteShortlink(id: string): Promise<boolean> {
+		const deletedShortlinks = await this.query<Shortlink>`
+			DELETE FROM shortlinks
+			WHERE id = ${id}
+			RETURNING *;
+		`;
+
+		return deletedShortlinks.length > 0;
+	}
 }

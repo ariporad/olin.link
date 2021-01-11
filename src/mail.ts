@@ -1,11 +1,14 @@
+import { resolve } from 'path';
 import {
 	createTestAccount as createNodemailerTestAccount,
 	createTransport,
 	getTestMessageUrl,
 } from 'nodemailer';
+import { Environment, FileSystemLoader } from 'nunjucks';
 
 export type Mailer = {
 	sendMail(to: string, subject: string, text: string, html?: string): Promise<void>;
+	sendTemplate(to: string, subject: string, name: string, context?: object): Promise<void>;
 	isTestAccount?: boolean;
 };
 
@@ -71,9 +74,23 @@ export async function createMailer(account: SMTPAccount): Promise<Mailer> {
 		},
 	});
 
+	const nunjucks = new Environment(new FileSystemLoader(resolve(__dirname, '..', 'emails')), {
+		noCache: process.env.NODE_ENV === 'development',
+	});
+
 	return {
 		get isTestAccount(): boolean {
 			return account.isTestAccount === true;
+		},
+
+		async sendTemplate(
+			to: string,
+			subject: string,
+			name: string,
+			context?: object,
+		): Promise<void> {
+			const text = nunjucks.render(name, context);
+			return await this.sendMail(to, subject, text);
 		},
 
 		async sendMail(to: string, subject: string, text: string, html?: string): Promise<void> {
@@ -88,5 +105,5 @@ export async function createMailer(account: SMTPAccount): Promise<Mailer> {
 			console.log('Sent Email!');
 			if (account.isTestAccount) console.log('View Email:', getTestMessageUrl(info));
 		},
-	};
+	} as Mailer;
 }
