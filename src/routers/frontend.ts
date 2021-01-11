@@ -1,14 +1,10 @@
 import { Router } from 'express';
-import { stringify } from 'querystring';
-import { isValidURL } from '../helpers';
-import Mailer from '../mail';
-import getDefaultMailer from '../mail';
-import Model, { Shortlink } from '../model';
+import { redirectWithFlash } from '../helpers';
+import ShortlinkController, { Shortlink } from '../shortlinkController';
 
 export default async function createFrontendRouter(): Promise<Router> {
 	const router = Router();
-	const model = await Model.getDefault();
-	const mailer = await Mailer.getDefault();
+	const shortlinkController = await ShortlinkController.getDefault();
 
 	router.get('/', (req, res) => {
 		const locals: any = {
@@ -26,101 +22,44 @@ export default async function createFrontendRouter(): Promise<Router> {
 	router.post('/_/form-create', async (req, res) => {
 		let { url, email, id } = req.body;
 
-		if (typeof url !== 'string' || !isValidURL(url, ['http:', 'https:', 'mailto:'])) {
-			res.status(400);
-			res.redirect(
-				'/?' +
-					stringify({
-						flash: 'Invalid URL',
-						flashtype: 'danger',
-					}),
-			);
-			return;
-		} else if (
-			typeof email !== 'string' ||
-			!/^[A-Za-z0-9\.]+@(students\.|alumni\.|faculty\.|staff\.|)olin\.edu$/u.test(email)
-		) {
-			res.status(400);
-			res.redirect(
-				'/?' +
-					stringify({
-						flash: 'Invalid Email',
-						flashtype: 'danger',
-					}),
-			);
-			return;
-		} else if (
-			id &&
-			(typeof id !== 'string' || !(id === '' || /^[a-zA-Z0-9_\-\.]{5,20}$/u.test(id)))
-		) {
-			res.status(400);
-			res.redirect(
-				'/?' +
-					stringify({
-						flash:
-							'Invalid Shortlink! Must be 5-20 characters using only letters, numbers, ., _, and -.',
-						flashtype: 'danger',
-					}),
-			);
+		let validationFails = [
+			shortlinkController.validate.url(url) || 'URL',
+			shortlinkController.validate.email(email) || 'Email',
+			(!!id && shortlinkController.validate.id(id)) || 'Shortlink',
+		].filter((x) => typeof x === 'string');
+
+		if (validationFails.length > 0) {
+			redirectWithFlash(res, '/', 400, 'danger', `Invalid ${validationFails.join(', ')}!`);
 			return;
 		}
 
 		let shortlink: Shortlink;
 
 		try {
-			shortlink = await model.createShortlink(email, url, id);
+			shortlink = await shortlinkController.create(email, url, id);
 		} catch (err) {
 			if (err.code === 'EIDINUSE') {
-				res.status(400);
-				res.redirect(
-					'/?' +
-						stringify({
-							flash: 'Sorry! That shortlink is already in use!',
-							flashtype: 'danger',
-						}),
+				redirectWithFlash(
+					res,
+					'/',
+					400,
+					'danger',
+					`Sorry! That shortlink is already in use!`,
 				);
 				return;
 			} else {
 				console.log('ERROR: Failed to create shortlink!', err);
-				res.status(500);
-				res.redirect(
-					'/?' +
-						stringify({
-							flash: 'Sorry! Failed to Create Shortlink! Unknown Internal Error!',
-							flashtype: 'danger',
-						}),
+				redirectWithFlash(
+					res,
+					'/',
+					500,
+					'danger',
+					'Sorry! Failed to Create Shortlink! Unknown Internal Error!',
 				);
 				return;
 			}
 		}
 
-		try {
-			await mailer.sendTemplate(
-				email,
-				`You've created Olin.link/${shortlink.id}!`,
-				'shortlink-created.njk',
-				{ shortlink },
-			);
-		} catch (err) {
-			console.log(
-				'ERROR: Failed to send shortlink creation email! Rolling back shortlink creation',
-				err,
-			);
-			// If we couldn't send the email, then un-create the shortlink. This could also be
-			// implemented by using a SQL transaction and waiting to commit/rollback it until the
-			// email was sent, but I think that's semantically messier and might have issues with
-			// holding a lock on the table for too long.
-			// We do not handle the case where this fails, because that almost certainly means we've
-			// disconnected from the DB, which is an unrecoverable error.
-			await model.deleteShortlink(shortlink.id);
-			res.redirect(
-				'/?' +
-					stringify({
-						flash: 'Sorry! Failed to Create Shortlink! Unknown Internal Error!',
-						flashtype: 'danger',
-					}),
-			);
-		}
 		res.redirect(`/${shortlink.id}/success`);
 	});
 

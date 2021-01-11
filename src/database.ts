@@ -1,5 +1,5 @@
 import { Client, QueryResult, QueryResultRow } from 'pg';
-import { randomString } from './helpers';
+import { InternalError, randomString } from './helpers';
 
 type ArrayQueryResult<R extends QueryResultRow = any> = QueryResult<R> & Array<R>;
 
@@ -11,25 +11,16 @@ export interface Shortlink {
 	created_at: Date;
 }
 
-export class ModelError extends Error {
-	readonly code: string;
+export default class Database {
+	private static default: Database;
 
-	constructor(message: string, code: string) {
-		super(message);
-		this.code = code;
-	}
-}
-
-export default class Model {
-	private static defaultModel: Model;
-
-	public static async getDefault(): Promise<Model> {
-		if (!this.defaultModel) {
-			this.defaultModel = new Model();
-			await this.defaultModel.connect();
+	public static async getDefault(): Promise<Database> {
+		if (!this.default) {
+			this.default = new Database();
+			await this.default.connect();
 		}
 
-		return this.defaultModel;
+		return this.default;
 	}
 
 	private client = new Client();
@@ -41,7 +32,7 @@ export default class Model {
 	}
 
 	public async connect() {
-		if (this.connected) throw new Error('Already connected!');
+		if (this.connected) throw new InternalError('Already connected!', 'EDBALREADYCONNECTED');
 		await this.client.connect();
 		this.isConnected = true;
 	}
@@ -50,7 +41,7 @@ export default class Model {
 		strings: TemplateStringsArray,
 		...embeds: (string | number)[]
 	): Promise<ArrayQueryResult<R>> {
-		if (!this.isConnected) throw new Error("Can't query if not connected!");
+		if (!this.isConnected) throw new InternalError("Can't query if not connected!", 'ENOCONN');
 
 		let queryString = '';
 
@@ -94,15 +85,15 @@ export default class Model {
 					// FIXME: If we ever ran out of randomly generated IDs, this would recurse forever
 					return await this.createShortlink(user, url);
 				} else {
-					throw new ModelError(`Shortlink ID "${id}" is already in use!`, 'EIDINUSE');
+					throw new InternalError(`Shortlink ID "${id}" is already in use!`, 'EIDINUSE');
 				}
 			}
 
-			throw new ModelError(`Unknown Database Error: ${err.message}`, 'EDBERROR');
+			throw new InternalError(`Unknown Database Error: ${err.message}`, 'EDBERROR', err);
 		}
 	}
 
-	public async getById(id: string): Promise<Shortlink | undefined> {
+	public async getShortlinkById(id: string): Promise<Shortlink | undefined> {
 		const [shortlink] = await this.query<Shortlink>`
 			SELECT *
 			FROM shortlinks
@@ -113,7 +104,7 @@ export default class Model {
 		return shortlink;
 	}
 
-	public async getByIdAndRecordHit(id: string): Promise<Shortlink | undefined> {
+	public async getShortlinkByIdAndRecordHit(id: string): Promise<Shortlink | undefined> {
 		const [shortlink] = await this.query<Shortlink>`
 			UPDATE shortlinks
 			SET hit_count = hit_count + 1

@@ -1,6 +1,13 @@
 import { promisify } from 'util';
 import { randomBytes as randomBytesCallback } from 'crypto';
 import { URL } from 'url';
+import { Response } from 'express';
+import { stringify } from 'querystring';
+
+// JS doesn't allow foo() || throw ..., so this function allows foo() || throwError(...) instead.
+export function throwError(error: Error) {
+	throw error;
+}
 
 // https://stackoverflow.com/a/55585593
 export function isValidURL(maybeURL: string, allowedProtocols?: string[]): boolean {
@@ -36,3 +43,32 @@ export const randomString = async (length: number) => {
 
 	return result;
 };
+
+export class InternalError extends Error {
+	readonly code: string;
+	readonly originalError?: Error;
+
+	constructor(message: string, code: string, originalError?: Error) {
+		super(message);
+		this.code = code;
+		this.originalError = originalError;
+	}
+}
+
+export function redirectWithFlash(
+	res: Response,
+	path: string,
+	statusCode: number,
+	flashType: string,
+	flash: string,
+) {
+	res.status(statusCode);
+	res.redirect(
+		path +
+			'?' +
+			stringify({
+				flash,
+				flashtype: flashType,
+			}),
+	);
+}

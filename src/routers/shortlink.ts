@@ -1,24 +1,22 @@
 import { Router } from 'express';
-import { stringify } from 'querystring';
-import Model, { Shortlink } from '../model';
 import { toString as generateQRCodeString, toFileStream as generateQRCodeStream } from 'qrcode';
+import { redirectWithFlash } from '../helpers';
+import ShortlinkController, { Shortlink } from '../shortlinkController';
 
 export default async function createShortlinkRouter(): Promise<Router> {
 	const router = Router();
-	const model = await Model.getDefault();
+	const shortlinkController = await ShortlinkController.getDefault();
 
 	router.get('/:shortlink/success', async (req, res) => {
 		const id = req.params.shortlink;
 
 		let shortlink: Shortlink | undefined;
 
-		if (!id || typeof id !== 'string' || !(shortlink = await model.getById(id))) {
-			res.status(404);
-			res.redirect(
-				'/?' +
-					stringify({ flash: 'Internal Error! Unknown Shortlink!', flashtype: 'danger' }),
-			);
-			return;
+		if (
+			!shortlinkController.validate.id(id) ||
+			!(shortlink = await shortlinkController.getById(id))
+		) {
+			return redirectWithFlash(res, '/', 404, 'warn', 'Unknown Shortlink!');
 		}
 
 		res.render('./views/success.html', {
@@ -44,7 +42,7 @@ export default async function createShortlinkRouter(): Promise<Router> {
 	router.get('/:shortlink', async (req, res, next) => {
 		const id = req.params.shortlink;
 
-		const shortlink = await model.getByIdAndRecordHit(id);
+		const shortlink = await shortlinkController.getByIdAndRecordHit(id);
 
 		if (!shortlink) {
 			res.status(404);
