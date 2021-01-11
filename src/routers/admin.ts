@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { stringify } from 'querystring';
-import { redirectWithFlash } from '../helpers';
+import { InternalError, redirectWithFlash } from '../helpers';
 import ShortlinkController from '../shortlinkController';
 
 export default async function createAdminRouter(): Promise<Router> {
@@ -44,6 +44,23 @@ export default async function createAdminRouter(): Promise<Router> {
 		}
 
 		res.redirect(`/_/admin#shortlink-${newId}`);
+	});
+
+	router.get('/_/admin/:shortlink/resend-confirmation', async (req, res) => {
+		const id = req.params.shortlink;
+		try {
+			shortlinkController.resendConfirmationEmail(id);
+		} catch (err) {
+			if (err.code === 'EBAGARGS') {
+				return redirectWithFlash(res, '/_/admin', 400, 'danger', 'Invalid ID!');
+			} else if (err.code === 'ENOTFOUND') {
+				return redirectWithFlash(res, '/_/admin', 404, 'danger', 'Shortlink Not Found!');
+			} else {
+				return redirectWithFlash(res, '/_/admin', 500, 'danger', 'Unknown Internal Error!');
+			}
+		}
+
+		res.redirect(`/_/admin#shortlink-${id}`);
 	});
 
 	return router;

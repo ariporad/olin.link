@@ -33,12 +33,7 @@ export default class ShortlinkController {
 		let shortlink = await this.db.createShortlink(email, url, id);
 
 		try {
-			await this.mailer.sendTemplate(
-				email,
-				`You've created Olin.link/${shortlink.id}!`,
-				'shortlink-created.njk',
-				{ shortlink },
-			);
+			await this.sendConfirmationEmail(shortlink);
 		} catch (err) {
 			console.log(
 				'ERROR: Failed to send shortlink creation email! Rolling back shortlink creation',
@@ -89,6 +84,25 @@ export default class ShortlinkController {
 		this.enforceValid.email(email);
 
 		return await this.db.updateShortlink(oldID, newID, url, email);
+	}
+
+	public async resendConfirmationEmail(id: string): Promise<void> {
+		this.enforceValid.id(id);
+
+		const shortlink = await this.getById(id);
+
+		if (!shortlink) throw new InternalError('Shortlink Not Found!', 'ENOTFOUND');
+
+		this.sendConfirmationEmail(shortlink);
+	}
+
+	private async sendConfirmationEmail(shortlink: Shortlink): Promise<void> {
+		await this.mailer.sendTemplate(
+			shortlink.email,
+			`You've created Olin.link/${shortlink.id}!`,
+			'shortlink-created.njk',
+			{ shortlink },
+		);
 	}
 
 	public readonly validate = {
