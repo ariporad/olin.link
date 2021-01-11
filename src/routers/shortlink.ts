@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { stringify } from 'querystring';
-import Model, { Shortlink } from '../model';
+import getDefaultModel, { Shortlink } from '../model';
 import { toString as generateQRCodeString, toFileStream as generateQRCodeStream } from 'qrcode';
 
-export default function createShortlinkRouter(model: Model): Router {
+export default async function createShortlinkRouter(): Promise<Router> {
 	const router = Router();
+	const model = await getDefaultModel();
 
 	router.get('/:shortlink/success', async (req, res) => {
 		const id = req.params.shortlink;

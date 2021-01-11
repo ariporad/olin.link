@@ -2,10 +2,11 @@ import { Router } from 'express';
 import { stringify } from 'querystring';
 import { isValidURL } from '../helpers';
 import getDefaultMailer from '../mail';
-import Model, { Shortlink } from '../model';
+import getDefaultModel, { Shortlink } from '../model';
 
-export default async function createFrontendRouter(model: Model): Promise<Router> {
+export default async function createFrontendRouter(): Promise<Router> {
 	const router = Router();
+	const model = await getDefaultModel();
 	const mailer = await getDefaultMailer();
 
 	router.get('/', (req, res) => {

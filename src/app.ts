@@ -6,12 +6,10 @@ import Model from './model';
 import createFrontendRouter from './routers/frontend';
 import createShortlinkRouter from './routers/shortlink';
 import createAdminRouter from './routers/admin';
+import getDefaultModel from './model';
 
 export default async function createApp() {
 	const app = express();
-	const model = new Model();
-
-	await model.connect();
 
 	app.set('views', resolve(__dirname, '..', 'views'));
 
@@ -25,9 +23,9 @@ export default async function createApp() {
 	app.use(bodyParser.json());
 	app.use(bodyParser.urlencoded());
 
-	app.use(await createFrontendRouter(model));
-	app.use(await createShortlinkRouter(model));
-	app.use(await createAdminRouter(model));
+	app.use(await createFrontendRouter());
+	app.use(await createShortlinkRouter());
+	app.use(await createAdminRouter());
 
 	return app;
 }

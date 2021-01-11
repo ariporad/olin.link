@@ -20,7 +20,18 @@ export class ModelError extends Error {
 	}
 }
 
-export default class Model {
+let defaultModel: Model;
+
+export default async function getDefaultModel(): Promise<Model> {
+	if (!defaultModel) {
+		defaultModel = new Model();
+		await defaultModel.connect();
+	}
+
+	return defaultModel;
+}
+
+export class Model {
 	private client = new Client();
 
 	private isConnected = false;
