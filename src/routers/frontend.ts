@@ -1,13 +1,14 @@
 import { Router } from 'express';
 import { stringify } from 'querystring';
 import { isValidURL } from '../helpers';
+import Mailer from '../mail';
 import getDefaultMailer from '../mail';
-import getDefaultModel, { Shortlink } from '../model';
+import Model, { Shortlink } from '../model';
 
 export default async function createFrontendRouter(): Promise<Router> {
 	const router = Router();
-	const model = await getDefaultModel();
-	const mailer = await getDefaultMailer();
+	const model = await Model.getDefault();
+	const mailer = await Mailer.getDefault();
 
 	router.get('/', (req, res) => {
 		const locals: any = {

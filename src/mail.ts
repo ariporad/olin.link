@@ -5,12 +5,7 @@ import {
 	getTestMessageUrl,
 } from 'nodemailer';
 import { Environment, FileSystemLoader } from 'nunjucks';
-
-export type Mailer = {
-	sendMail(to: string, subject: string, text: string, html?: string): Promise<void>;
-	sendTemplate(to: string, subject: string, name: string, context?: object): Promise<void>;
-	isTestAccount?: boolean;
-};
+import Mail from 'nodemailer/lib/mailer';
 
 export type SMTPAccount = {
 	host: string;
@@ -34,76 +29,76 @@ async function createTestAccount(): Promise<SMTPAccount> {
 	};
 }
 
-let defaultMailer: Mailer | null = null;
+export default class Mailer {
+	private static default: Mailer;
 
-export default async function getDefaultMailer(): Promise<Mailer> {
-	if (!defaultMailer) {
-		let account: SMTPAccount;
+	public static async getDefault(): Promise<Mailer> {
+		if (!this.default) {
+			let account: SMTPAccount;
 
-		if (process.env.SMTP_USE_TEST_ACCOUNT === 'false') {
-			const host = process.env.SMTP_HOST;
-			const port = parseInt(process.env.SMTP_PORT || 'error!', 10);
-			const user = process.env.SMTP_USER;
-			const pass = process.env.SMTP_PASS;
+			if (process.env.SMTP_USE_TEST_ACCOUNT === 'false') {
+				const host = process.env.SMTP_HOST;
+				const port = parseInt(process.env.SMTP_PORT || 'error!', 10);
+				const user = process.env.SMTP_USER;
+				const pass = process.env.SMTP_PASS;
 
-			if (host && port && user && pass) {
-				account = { host, port, user, pass, isTestAccount: false };
+				if (host && port && user && pass) {
+					account = { host, port, user, pass, isTestAccount: false };
+				} else {
+					throw new Error(
+						'WARNING: $SMTP_USE_TEST_ACCOUNT === "true" but SMTP credentials aren\'t properly set!',
+					);
+				}
 			} else {
-				throw new Error(
-					'WARNING: $SMTP_USE_TEST_ACCOUNT === "true" but SMTP credentials aren\'t properly set!',
-				);
+				account = await createTestAccount();
 			}
-		} else {
-			account = await createTestAccount();
+
+			this.default = new this(account);
 		}
 
-		defaultMailer = await createMailer(account);
+		return this.default;
 	}
 
-	return defaultMailer;
-}
-
-export async function createMailer(account: SMTPAccount): Promise<Mailer> {
-	// create reusable transporter object using the default SMTP transport
-	let transporter = createTransport({
-		host: account.host,
-		port: account.port,
-		auth: {
-			user: account.user,
-			pass: account.pass,
+	private readonly account: SMTPAccount;
+	private readonly transport: Mail;
+	private readonly nunjucks: Environment = new Environment(
+		new FileSystemLoader(resolve(__dirname, '..', 'emails')),
+		{
+			noCache: process.env.NODE_ENV === 'development',
 		},
-	});
+	);
 
-	const nunjucks = new Environment(new FileSystemLoader(resolve(__dirname, '..', 'emails')), {
-		noCache: process.env.NODE_ENV === 'development',
-	});
+	public get isTestAccount(): boolean {
+		return this.account.isTestAccount === true;
+	}
 
-	return {
-		get isTestAccount(): boolean {
-			return account.isTestAccount === true;
-		},
+	public constructor(account: SMTPAccount) {
+		this.account = account;
+		this.transport = createTransport({
+			host: account.host,
+			port: account.port,
+			auth: {
+				user: account.user,
+				pass: account.pass,
+			},
+		});
+	}
 
-		async sendTemplate(
-			to: string,
-			subject: string,
-			name: string,
-			context?: object,
-		): Promise<void> {
-			const text = nunjucks.render(name, context);
-			return await this.sendMail(to, subject, text);
-		},
+	async sendTemplate(to: string, subject: string, name: string, context?: object): Promise<void> {
+		const text = this.nunjucks.render(name, context);
+		return await this.sendMail(to, subject, text);
+	}
 
-		async sendMail(to: string, subject: string, text: string, html?: string): Promise<void> {
-			let info = await transporter.sendMail({
-				from: `"Olin.link" <${account.user}>`,
-				to,
-				subject,
-				text,
-				html,
-			});
+	async sendMail(to: string, subject: string, text: string, html?: string): Promise<void> {
+		let info = await this.transport.sendMail({
+			from: `"Olin.link" <${this.account.user}>`,
+			to,
+			subject,
+			text,
+			html,
+		});
 
-			console.log('Sent Email!');
-			if (account.isTestAccount) console.log('View Email:', getTestMessageUrl(info));
-		},
-	} as Mailer;
+		console.log('Sent Email!');
+		if (this.account.isTestAccount) console.log('View Email:', getTestMessageUrl(info));
+	}
 }

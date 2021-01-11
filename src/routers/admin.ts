@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { stringify } from 'querystring';
-import getDefaultModel from '../model';
+import Model from '../model';
 
 export default async function createAdminRouter(): Promise<Router> {
 	const router = Router();
-	const model = await getDefaultModel();
+	const model = await Model.getDefault();
 
 	router.get('/_/admin', async (req, res) => {
 		res.render('./views/admin/index.html', {
